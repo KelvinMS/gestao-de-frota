@@ -4,6 +4,7 @@ from PIL import Image, ImageTk
 from tkinter import filedialog
 import tkinter as tk
 import sqlite3
+import vehicle_data
 
 
 root = Tk()
@@ -34,45 +35,14 @@ class Functions():
         self.entry_ano.delete(0,END)
         self.entry_combustivel.delete(0,END)
 
-    #Conntect to db
-    def connect_db(self):
-        self.conn = sqlite3.connect('vehicles.bd')
-        self.cursor = self.conn.cursor()
 
-    #Disconntect to db
-    def desconnect_db(self):
-        self.conn.close()
-
-    #Create vehicle tables
-    def createTables(self):
-        self.connect_db()
-        print('Connected to DB')
-        self.cursor.execute("""                                   
-            CREATE TABLE IF NOT EXISTS vehicles(
-                cod INTEGER PRIMARY KEY,
-                marca CHAR(15) NOT NULL,
-                modelo CHAR(15) NOT NULL,
-                placa CHAR(20) NOT NULL,
-                quilometragem CHAR(15) NOT NULL,
-                ano CHAR(40) NOT NULL,
-                combustivel CHAR(40) NOT NULL
-                );
-            """)
-        self.conn.commit()
-        
-        print('Banco Criado')
- 
     #Add vehicle to db and update treeview
     def addVehiclesDB(self):       
             result = self.entryCarVariables()
             if result == False:
                 messagebox.showerror("Erro", "Preencha todos os campos necessários para adicionar veículo!")
                 return
-            self.connect_db()
-            self.cursor.execute(""" INSERT INTO  vehicles (marca,modelo,placa,quilometragem,ano,combustivel)
-                                VALUES (?,?,?,?,?,?)""", (self.marca,self.modelo,self.placa,self.quilometragem,self.ano,self.combustivel))
-            self.conn.commit()
-            self.desconnect_db()
+            vehicle_data.VehicleDataFuntionsDB.addVehiclesDB(self,self.marca,self.modelo,self.placa,self.quilometragem,self.ano,self.combustivel)
             self.updateVehiclesInTreeView()
             messagebox.showinfo("Sucesso", "Veículo adicionado com sucesso!")
     
@@ -82,10 +52,7 @@ class Functions():
         if result==False and not self.cod:
             messagebox.showerror("Erro", "Preencha o código do veículo!")
             return
-        self.connect_db()
-        self.cursor.execute(""" DELETE FROM vehicles WHERE cod = ? """, (self.cod))
-        self.conn.commit()
-        self.desconnect_db()
+        vehicle_data.VehicleDataFuntionsDB.deleteVehicleDB(self,self.cod)
         self.cleanFormCarEntry()
         self.updateVehiclesInTreeView()
         messagebox.showinfo("Sucesso", "Veículo removido com sucesso!")
@@ -96,12 +63,7 @@ class Functions():
         if result==False and not self.cod:
             messagebox.showerror("Erro", "Preencha o código do veículo!")
             return
-        self.connect_db()
-        self.cursor.execute(""" UPDATE vehicles 
-            SET  marca = ?,modelo = ?,placa = ?,quilometragem = ?,ano = ?,combustivel = ? WHERE cod = ? """,
-            (self.marca,self.modelo,self.placa,self.quilometragem,self.ano,self.combustivel, self.cod))
-        self.conn.commit()
-        self.desconnect_db()
+        vehicle_data.VehicleDataFuntionsDB.updateVehicleDB(self,self.marca,self.modelo,self.placa,self.quilometragem,self.ano,self.combustivel,self.cod)
         self.cleanFormCarEntry()
         self.updateVehiclesInTreeView()
         messagebox.showinfo("Sucesso", "Informações do Veículo alteradas com sucesso!")
@@ -109,26 +71,20 @@ class Functions():
     #Update treeview
     def updateVehiclesInTreeView(self):
         self.vehicle_TreeViewTable.delete(*self.vehicle_TreeViewTable.get_children())
-        self.connect_db()
-        cursorList = self.cursor.execute(""" SELECT cod,marca,modelo,placa,quilometragem,ano,combustivel
-        FROM vehicles ORDER BY cod ASC;""")
+        cursorList = vehicle_data.VehicleDataFuntionsDB.getVehiclesDB(self)
         for i in cursorList:
             self.vehicle_TreeViewTable.insert("",END, values=i)
-        self.desconnect_db()
         self.cleanFormCarEntry()
     
+    #Search vehicle in db and update treeview
     def searchVehicle(self):
         self.vehicle_TreeViewTable.delete(*self.vehicle_TreeViewTable.get_children())
-        self.connect_db()  
         self.entry_marca.insert(END,'%') 
         marca = self.entry_marca.get()
-        self.cursor.execute(""" SELECT cod,marca,modelo,placa,quilometragem,ano,combustivel
-        FROM vehicles WHERE marca LIKE '%s'ORDER BY cod ASC;""" % marca) 
-        search_marca = self.cursor.fetchall()
-        for i in search_marca:
+        cursorList = vehicle_data.VehicleDataFuntionsDB.searchVehicleDB(self,marca)
+        for i in cursorList:
             self.vehicle_TreeViewTable.insert("",END, values=i)
         self.cleanFormCarEntry()
-        self.desconnect_db()
     
     #Load the values of treeview selection on Entrys
     def onDoubleClick(self,event):
@@ -154,9 +110,6 @@ class Functions():
             self.vehicle_TreeViewTable.delete(*self.vehicle_TreeViewTable.get_children())
 
 
-    def validCarCod(self,event):
-        self
-
     def saveAttachment(self):
         self.attachment = filedialog.askopenfilename(title='Selecione um arquivo')
         print(self.attachment)
@@ -165,10 +118,10 @@ class Functions():
 
 
 
-class Application(Functions):
+class Application(Functions,vehicle_data.VehicleDataFuntionsDB):
     def __init__(self):
         self.root = root
-        self.createTables()
+        vehicle_data.VehicleDataFuntionsDB.createTableVehicles(self)
         self.mainPage()
         self.frames()
         self.updateVehiclesInTreeView()
