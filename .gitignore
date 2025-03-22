@@ -1,0 +1,6 @@
+ambiente-virtual
+dist/*
+build/*
+*.pyc
+__pycache__/
+*.bd
