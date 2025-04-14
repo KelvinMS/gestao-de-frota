@@ -34,7 +34,7 @@ class DriverDataFuntionsDB():
     #Add driver to db and update treeview
     def addDriveToDB(self,nome,cpf,cnh,email,telefone,cnh_path):       
         self.connect_drive_db()
-        self.cursor.execute(""" INSERT INTO  drives (nome,cpf,cnh,email,telefone,cnh_path)
+        self.cursor.execute(""" INSERT INTO  drivers (nome,cpf,cnh,email,telefone,cnh_path)
                             VALUES (?,?,?,?,?,?)""", (nome,cpf,cnh,email,telefone,cnh_path))
         self.conn.commit()
         self.desconnect_driver_db()
