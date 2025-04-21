@@ -173,16 +173,16 @@ class DriversFunctions():
             self.updateDriversInTreeView()
             messagebox.showinfo("Sucesso", "Motorista adicionado com sucesso!")
     
-    #Delete vehicle to db and update treeview
+    #Delete driver to db and update treeview
     def deleteDriverDB(self):
-        result = self.entryCarVariables()
-        if result==False and not self.cod:
-            messagebox.showerror("Erro", "Preencha o código do veículo!")
+        result = self.entryDriverVariables()
+        if result==False and not self.cod_driver:
+            messagebox.showerror("Erro", "Preencha o código do Motorista!")
             return
-        vehicle_data.VehicleDataFuntionsDB.deleteVehicleDB(self,self.cod)
-        self.cleanFormCarEntry()
-        self.updateVehiclesInTreeView()
-        messagebox.showinfo("Sucesso", "Veículo removido com sucesso!")
+        drivers_data.DriverDataFuntionsDB.deleteDriverToDB(self,self.cod_driver)
+        self.cleanFormDriverEntry()
+        self.updateDriversInTreeView()
+        messagebox.showinfo("Sucesso", "Motorista removido com sucesso!")
   
     #Update vehicle into db and update treeview
     def updateDriverDB(self):
@@ -191,9 +191,19 @@ class DriversFunctions():
             messagebox.showerror("Erro", "Preencha o código do veículo!")
             return
         vehicle_data.VehicleDataFuntionsDB.updateVehicleDB(self,self.marca,self.modelo,self.placa,self.quilometragem,self.ano,self.combustivel,self.cod)
-        self.cleanFormCarEntry()
-        self.updateVehiclesInTreeView()
-        messagebox.showinfo("Sucesso", "Informações do Veículo alteradas com sucesso!")
+        self.cleanFormDriverEntry()
+        self.updateDriversInTreeView()
+        messagebox.showinfo("Sucesso", "Informações do Motorista alteradas com sucesso!")
+
+    
+    #Update treeview with all vehicles from db
+    def updateDriversInTreeView(self):
+        self.treeView_table.delete(*self.treeView_table.get_children())
+        cursorList = drivers_data.DriverDataFuntionsDB.getDriversDB(self)
+        for i in cursorList:
+            self.treeView_table.insert("",END, values=i)
+        self.cleanFormDriverEntry()
+
 
     def saveAttachment(self):
         self.attachment_path = filedialog.askopenfilename(title='Selecione um arquivo')
@@ -235,7 +245,7 @@ class Application(VehiclesFunctions,DriversFunctions,vehicle_data.VehicleDataFun
         self.createTreeViewDataVehicles()
         
     #widgets tab veiculos
-    def widgetsTabCarData(self):
+    def widgetsTabVehiclesData(self):
         
         self.btn_search_car = tk.Button(self.tab_car_data, text="Pesquisar",command=self.searchVehicle).grid(row=0, column=0, pady=5)
         self.btn_add_car = tk.Button(self.tab_car_data, text="Adicionar Veículo",command=self.addVehiclesDB).grid(row=1, column=0, pady=5)
@@ -278,8 +288,8 @@ class Application(VehiclesFunctions,DriversFunctions,vehicle_data.VehicleDataFun
         
         self.btn_search_driver = tk.Button(self.tab_driver_data, text="Pesquisar",command=self.searchVehicle).grid(row=0, column=0, pady=5)
         self.btn_add_driver = tk.Button(self.tab_driver_data, text="Adicionar Motorista",command=self.addDriverDB).grid(row=1, column=0, pady=5)
-        self.btn_delete_driver = tk.Button(self.tab_driver_data, text="Remover Motorista",command=self.deleteVehicleDB).grid(row=2, column=0, pady=5)
-        self.btn_update_driver = tk.Button(self.tab_driver_data, text="Editar Dados do Motorista",command=self.updateVehicleDB).grid(row=3, column=0, pady=5)
+        self.btn_delete_driver = tk.Button(self.tab_driver_data, text="Remover Motorista",command=self.deleteDriverDB).grid(row=2, column=0, pady=5)
+        self.btn_update_driver = tk.Button(self.tab_driver_data, text="Editar Dados do Motorista",command=self.updateDriverDB).grid(row=3, column=0, pady=5)
         self.btn_delete_formEntry = tk.Button(self.tab_driver_data, text="Apagar campos de pesquisa",command=self.cleanFormCarEntry).grid(row=4, column=0,pady=1)
 
         #Entry and labels
@@ -335,7 +345,7 @@ class Application(VehiclesFunctions,DriversFunctions,vehicle_data.VehicleDataFun
 
         self.tabs_notebook.bind('<<NotebookTabChanged>>', self.onTabChange)
 
-        self.widgetsTabCarData()
+        self.widgetsTabVehiclesData()
         self.widgetsTabDriverData()
 
 
