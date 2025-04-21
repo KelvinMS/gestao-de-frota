@@ -43,7 +43,7 @@ class DriverDataFuntionsDB():
     #Delete driver from db
     def deleteDriverToDB(self,cod):
         self.connect_drive_db()
-        self.cursor.execute(""" DELETE FROM drivers WHERE cod = ? """, (cod))
+        self.cursor.execute(""" DELETE FROM drivers WHERE cod = ? """, (cod,))
         self.conn.commit()
         self.desconnect_driver_db()
         print('Veiculo Deletado')
