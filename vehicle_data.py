@@ -25,11 +25,25 @@ class VehicleDataFuntionsDB():
                 placa CHAR(20) NOT NULL,
                 quilometragem CHAR(15) NOT NULL,
                 ano CHAR(40) NOT NULL,
-                combustivel CHAR(40) NOT NULL
+                combustivel CHAR(40) NOT NULL,
+                data_prox_revisao CHAR(40) NOT NULL,
+                data_ulti_revisao CHAR(40)
                 );
             """)
         self.conn.commit()
         print('Banco vehicles Criado')
+
+    # def addColumns(self):
+    #     self.connect_vehicle_db()
+    #     self.cursor.execute("""
+    #         ALTER TABLE vehicles ADD COLUMN data_prox_revisao CHAR(40);
+    #         """)
+    #     self.cursor.execute("""
+    #         ALTER TABLE vehicles ADD COLUMN data_ulti_revisao CHAR(40);
+    #         """)
+    #     self.conn.commit()
+    #     print('Coluna data_prox_revisao  e data_ulti_revisao Adicionadas')
+    #     self.desconnect_vehicle_db()
 
     #Add vehicle to db and update treeview
     def addVehiclesDB(self,marca,modelo,placa,quilometragem,ano,combustivel):       
@@ -60,7 +74,7 @@ class VehicleDataFuntionsDB():
 
     def getVehiclesDB(self):
         self.connect_vehicle_db()
-        cursorList = self.cursor.execute(""" SELECT cod,marca,modelo,placa,quilometragem,ano,combustivel
+        cursorList = self.cursor.execute(""" SELECT cod,marca,modelo,placa,quilometragem,ano,combustivel,data_prox_revisao,data_ulti_revisao
         FROM vehicles ORDER BY cod ASC;""").fetchall()#fetchall() retorna uma lista com todos os registros
         self.desconnect_vehicle_db()
         if cursorList == []:
@@ -71,11 +85,12 @@ class VehicleDataFuntionsDB():
         
     def searchVehicleDB(self,marca):
         self.connect_vehicle_db()
-        cursorList =self.cursor.execute(""" SELECT cod,marca,modelo,placa,quilometragem,ano,combustivel
+        cursorList =self.cursor.execute(""" SELECT cod,marca,modelo,placa,quilometragem,ano,combustivel,data_prox_revisao,data_ulti_revisao
         FROM vehicles WHERE marca LIKE '%s'ORDER BY cod ASC;""" % marca).fetchall()
         self.desconnect_vehicle_db()
         if cursorList == []:
             print('Veiculo não encontrado')
         else:
             print('Veiculo Encontrado')
+            print(cursorList)
         return cursorList

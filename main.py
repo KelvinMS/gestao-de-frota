@@ -74,7 +74,6 @@ class VehiclesFunctions():
             self.treeView_table.insert("",END, values=i)
         self.cleanFormCarEntry()
     
-
     
     def updateDriversInTreeView(self):
         self.treeView_table.delete(*self.treeView_table.get_children())
@@ -98,7 +97,7 @@ class VehiclesFunctions():
         self.cleanFormCarEntry()
         self.treeView_table.selection()
         for entry in self.treeView_table.selection():
-            col1,col2,col3,col4,col5,col6,col7 = self.treeView_table.item(entry,'values')
+            col1,col2,col3,col4,col5,col6,col7,col8,col9 = self.treeView_table.item(entry,'values')
             self.entry_cod.insert(END,col1)
             self.entry_marca.insert(END,col2)
             self.entry_modelo.insert(END,col3)
@@ -162,8 +161,7 @@ class DriversFunctions():
         self.entry_phone_driver.delete(0,END)
         self.label_attachment.config(text="")
 
-
-        #Add vehicle to db and update treeview
+    #Add vehicle to db and update treeview
     def addDriverDB(self):       
             result = self.entryDriverVariables()
             if result == False:
@@ -186,15 +184,24 @@ class DriversFunctions():
   
     #Update vehicle into db and update treeview
     def updateDriverDB(self):
-        result = self.entryCarVariables()
-        if result==False and not self.cod:
-            messagebox.showerror("Erro", "Preencha o código do veículo!")
+        result = self.entryDriverVariables()
+        if result==False and not self.cod_driver:
+            messagebox.showerror("Erro", "Preencha o código do motorista!")
             return
-        vehicle_data.VehicleDataFuntionsDB.updateVehicleDB(self,self.marca,self.modelo,self.placa,self.quilometragem,self.ano,self.combustivel,self.cod)
+        drivers_data.DriverDataFuntionsDB.updateDriversDB(self,self.name_driver,self.cpf_driver,self.cnh_driver,self.email_driver,self.phone_driver,self.cnh_path,self.cod_driver)
         self.cleanFormDriverEntry()
         self.updateDriversInTreeView()
         messagebox.showinfo("Sucesso", "Informações do Motorista alteradas com sucesso!")
 
+    #Search vehicle in db and update treeview
+    def searchDriver(self):
+        self.treeView_table.delete(*self.treeView_table.get_children())
+        self.entry_name_driver.insert(END,'%') 
+        name = self.entry_name_driver.get()
+        cursorList = drivers_data.DriverDataFuntionsDB.searchDriverDB(self,name)
+        for i in cursorList:
+            self.treeView_table.insert("",END, values=i)
+        self.cleanFormDriverEntry()
     
     #Update treeview with all vehicles from db
     def updateDriversInTreeView(self):
@@ -204,7 +211,7 @@ class DriversFunctions():
             self.treeView_table.insert("",END, values=i)
         self.cleanFormDriverEntry()
 
-
+    #Attachement logic
     def saveAttachment(self):
         self.attachment_path = filedialog.askopenfilename(title='Selecione um arquivo')
         self.label_attachment.config(text=self.attachment_path)
@@ -217,6 +224,7 @@ class Application(VehiclesFunctions,DriversFunctions,vehicle_data.VehicleDataFun
         self.root = root
         vehicle_data.VehicleDataFuntionsDB.createTableVehicles(self)
         drivers_data.DriverDataFuntionsDB.createTableDrivers(self)
+        
         self.mainPage()
         self.frames()
         self.updateVehiclesInTreeView()
@@ -232,16 +240,16 @@ class Application(VehiclesFunctions,DriversFunctions,vehicle_data.VehicleDataFun
 
     #Creation of Frames
     def frames(self):
-        self.frameCarData_1 = Frame(self.root,bd=4,bg='#dfe3ee',
+        self.framePanelData_1 = Frame(self.root,bd=4,bg='#dfe3ee',
             highlightbackground='#759fe6', highlightthickness=3)
-        self.frameCarData_1.place(relx=0.05,rely=0.05,relwidth=0.90,relheight=.42)
+        self.framePanelData_1.place(relx=0.05,rely=0.05,relwidth=0.90,relheight=.42)
 
         self.frameTreeView_1 = Frame(self.root,bd=4,bg='#dfe3ee',
             highlightbackground='#759fe6', highlightthickness=2)
         self.frameTreeView_1.place(relx=0.05,rely=0.5,relwidth=0.90,relheight=.50)
 
         self.createWidgets()
-        self.treeView_table = ttk.Treeview(self.frameTreeView_1, height=1,columns=('col1','col2','col3','col4','col5','col6','col7'))
+        self.treeView_table = ttk.Treeview(self.frameTreeView_1, height=1,columns=('col1','col2','col3','col4','col5','col6','col7','col8','col9'))
         self.createTreeViewDataVehicles()
         
     #widgets tab veiculos
@@ -282,11 +290,10 @@ class Application(VehiclesFunctions,DriversFunctions,vehicle_data.VehicleDataFun
         self.entry_combustivel = tk.Entry(self.tab_car_data)
         self.entry_combustivel.grid(row=6, column=5)
     
-
     #Creation of buttons
     def widgetsTabDriverData(self):
         
-        self.btn_search_driver = tk.Button(self.tab_driver_data, text="Pesquisar",command=self.searchVehicle).grid(row=0, column=0, pady=5)
+        self.btn_search_driver = tk.Button(self.tab_driver_data, text="Pesquisar",command=self.searchDriver).grid(row=0, column=0, pady=5)
         self.btn_add_driver = tk.Button(self.tab_driver_data, text="Adicionar Motorista",command=self.addDriverDB).grid(row=1, column=0, pady=5)
         self.btn_delete_driver = tk.Button(self.tab_driver_data, text="Remover Motorista",command=self.deleteDriverDB).grid(row=2, column=0, pady=5)
         self.btn_update_driver = tk.Button(self.tab_driver_data, text="Editar Dados do Motorista",command=self.updateDriverDB).grid(row=3, column=0, pady=5)
@@ -328,12 +335,9 @@ class Application(VehiclesFunctions,DriversFunctions,vehicle_data.VehicleDataFun
 
         #self.attachment_icon = PhotoImage(file='images\\icon_attachment.png').subsample(10,10)
 
-    
-     
-
     #Call the functions to create widgets individually
     def createWidgets(self):
-        self.tabs_notebook =ttk.Notebook(self.frameCarData_1)
+        self.tabs_notebook =ttk.Notebook(self.framePanelData_1)
         self.tab_car_data = Frame(self.tabs_notebook,background='lightgray')
         self.tab_driver_data = Frame(self.tabs_notebook,background='lightgray')
         self.tab_notification_data = Frame(self.tabs_notebook,background='lightgray')
@@ -348,7 +352,6 @@ class Application(VehiclesFunctions,DriversFunctions,vehicle_data.VehicleDataFun
         self.widgetsTabVehiclesData()
         self.widgetsTabDriverData()
 
-
     #Creation of treeview
     def createTreeViewDataVehicles(self):
              
@@ -360,15 +363,19 @@ class Application(VehiclesFunctions,DriversFunctions,vehicle_data.VehicleDataFun
         self.treeView_table.heading('#5', text='Quilometragem')
         self.treeView_table.heading('#6', text='Ano')
         self.treeView_table.heading('#7', text='Combustível')
+        self.treeView_table.heading('#8', text='Data Prox Revisão')
+        self.treeView_table.heading('#9', text='Data Ult Revisão')
 
-        self.treeView_table.column('#0',width=10)
-        self.treeView_table.column('#1',width=15,anchor=CENTER)
-        self.treeView_table.column('#2',width=150,anchor=CENTER)
-        self.treeView_table.column('#3',width=150,anchor=CENTER)
-        self.treeView_table.column('#4',width=150,anchor=CENTER)
-        self.treeView_table.column('#5',width=150,anchor=CENTER)
-        self.treeView_table.column('#6',width=150,anchor=CENTER)
-        self.treeView_table.column('#7',width=150,anchor=CENTER)
+        self.treeView_table.column('#0',width=10,stretch=NO)
+        self.treeView_table.column('#1',width=15,anchor=CENTER,stretch=NO)
+        self.treeView_table.column('#2',width=150,anchor=CENTER,stretch=NO)
+        self.treeView_table.column('#3',width=150,anchor=CENTER,stretch=NO)
+        self.treeView_table.column('#4',width=150,anchor=CENTER,stretch=NO)
+        self.treeView_table.column('#5',width=150,anchor=CENTER,stretch=NO)
+        self.treeView_table.column('#6',width=150,anchor=CENTER,stretch=NO)
+        self.treeView_table.column('#7',width=150,anchor=CENTER,stretch=NO)
+        self.treeView_table.column('#8',width=150,anchor=CENTER,stretch=NO)
+        self.treeView_table.column('#9',width=150,anchor=CENTER,stretch=NO)
         self.treeView_table.place(relx=0.01,rely=.01,relwidth=.97,relheight=.95)
         self.treeView_table.bind("<Double-1>",self.onDoubleClickVehicleTreeView)
         
@@ -379,7 +386,7 @@ class Application(VehiclesFunctions,DriversFunctions,vehicle_data.VehicleDataFun
                 
         scrollbarHorizontalTreeView = Scrollbar(self.frameTreeView_1,orient='horizontal',)
         self.treeView_table.config(xscroll=scrollbarHorizontalTreeView.set)
-        scrollbarHorizontalTreeView.place(relx=0.01,rely=.96,relwidth=.97,relheight=.035)
+        scrollbarHorizontalTreeView.place(relx=0.01,rely=.96,relwidth=.97,relheight=.040)
            
     #Creation of treeview
     def createTreeViewDataDrivers(self):
@@ -402,10 +409,6 @@ class Application(VehiclesFunctions,DriversFunctions,vehicle_data.VehicleDataFun
         self.treeView_table.column('#7',width=150,anchor=CENTER)
         self.treeView_table.bind("<Double-1>",self.onDoubleClickDriverTreeView)
         
-
-
-        
-
 
 
     #Create menus
