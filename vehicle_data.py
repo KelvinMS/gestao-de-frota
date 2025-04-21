@@ -43,7 +43,7 @@ class VehicleDataFuntionsDB():
     #Delete vehicle from db
     def deleteVehicleDB(self,cod):
         self.connect_vehicle_db()
-        self.cursor.execute(""" DELETE FROM vehicles WHERE cod = ? """, (cod))
+        self.cursor.execute(""" DELETE FROM vehicles WHERE cod = ? """, (cod,))
         self.conn.commit()
         self.desconnect_vehicle_db()
         print('Veiculo Deletado')
