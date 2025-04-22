@@ -2,11 +2,14 @@ from tkinter import *
 from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
 from tkinter import filedialog
+from tkcalendar import Calendar
 import tkinter as tk
 import vehicle_data
 import drivers_data
+import locale
+import datetime
 
-
+locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8') # Set the locale to Portuguese (Brazil)
 root = Tk()
 
 
@@ -21,6 +24,7 @@ class VehiclesFunctions():
         self.combustivel = self.entry_combustivel.get()   
         self.quilometragem = self.entry_quilometragem.get()
         self.ano = self.entry_ano.get()
+        self.data_ulti_revisao = self.calendar.get_date()
         if not self.marca or not self.modelo or not self.placa or not self.ano:
            return False
         
@@ -33,6 +37,8 @@ class VehiclesFunctions():
         self.entry_quilometragem.delete(0,END)
         self.entry_ano.delete(0,END)
         self.entry_combustivel.delete(0,END)
+        self.lbl_lastRevision_date.config(text="")
+        
 
     #Add vehicle to db and update treeview
     def addVehiclesDB(self):       
@@ -40,7 +46,7 @@ class VehiclesFunctions():
             if result == False:
                 messagebox.showerror("Erro", "Preencha todos os campos necessários para adicionar veículo!")
                 return
-            vehicle_data.VehicleDataFuntionsDB.addVehiclesDB(self,self.marca,self.modelo,self.placa,self.quilometragem,self.ano,self.combustivel)
+            vehicle_data.VehicleDataFuntionsDB.addVehiclesDB(self,self.marca,self.modelo,self.placa,self.quilometragem,self.ano,self.combustivel,self.data_ulti_revisao)
             self.updateVehiclesInTreeView()
             messagebox.showinfo("Sucesso", "Veículo adicionado com sucesso!")
     
@@ -61,7 +67,7 @@ class VehiclesFunctions():
         if result==False and not self.cod:
             messagebox.showerror("Erro", "Preencha o código do veículo!")
             return
-        vehicle_data.VehicleDataFuntionsDB.updateVehicleDB(self,self.marca,self.modelo,self.placa,self.quilometragem,self.ano,self.combustivel,self.cod)
+        vehicle_data.VehicleDataFuntionsDB.updateVehicleDB(self,self.marca,self.modelo,self.placa,self.quilometragem,self.ano,self.combustivel,self.data_ulti_revisao,self.cod)
         self.cleanFormCarEntry()
         self.updateVehiclesInTreeView()
         messagebox.showinfo("Sucesso", "Informações do Veículo alteradas com sucesso!")
@@ -105,6 +111,7 @@ class VehiclesFunctions():
             self.entry_quilometragem.insert(END,col5)
             self.entry_ano.insert(END,col6)
             self.entry_combustivel.insert(END,col7)
+            self.lbl_lastRevision_date.config(text="Data da última revisão: "+col9)
 
     #Load the values of treeview selection on Entrys
     def onDoubleClickDriverTreeView(self,event):
@@ -120,7 +127,7 @@ class VehiclesFunctions():
             self.entry_phone_driver.insert(END,col6)
             self.label_attachment.config(text=col7)
                         
-
+    #Action on tab change
     def onTabChange(self,event):
         tab = event.widget.tab('current')['text']
         if tab == 'Veículos':	
@@ -132,12 +139,20 @@ class VehiclesFunctions():
             self.createTreeViewDataDrivers()
             self.updateDriversInTreeView()
 
+    # Open Calaendar and bind the event to select a date
+    def abrir_calendario(self):
+        self.calendar.place(relx=0.5, rely=0.5, anchor='center')
+        self.calendar.bind("<<CalendarSelected>>", self.selecionar_data)        
     
-    
+    # Action when selecting a date in the calendar
+    def selecionar_data(self, event):
+        self.data_ulti_revisao = self.calendar.get_date()  # formato: yyyy-mm-dd
+        self.calendar.place_forget()
+        self.lbl_lastRevision_date.config(text="Data da última revisão: "+self.data_ulti_revisao)
+        #self.lbl_lastRevision_date =Label(self.tab_car_data, text="Data da última revisão"+col9).grid(row=7, column=5,sticky="W",padx=5,pady=5)
 
 class DriversFunctions():
 
-    
     # Get entry values from frame
     def entryDriverVariables(self):
         self.cod_driver = self.entry_cod_driver.get()   
@@ -289,6 +304,12 @@ class Application(VehiclesFunctions,DriversFunctions,vehicle_data.VehicleDataFun
         tk.Label(self.tab_car_data, text="Combustível:").grid(row=6, column=4,sticky="W")
         self.entry_combustivel = tk.Entry(self.tab_car_data)
         self.entry_combustivel.grid(row=6, column=5)
+
+        self.calendar = Calendar(self.tab_car_data, date_pattern='yyyy-mm-dd', locale='pt_BR')
+        self.lbl_lastRevision_date =Label(self.tab_car_data,text="")
+        self.lbl_lastRevision_date.grid(row=7, column=5,columnspan=2,sticky="W",padx=5,pady=5)
+        tk.Button(self.tab_car_data, text="Selecionar Data da Revisão Veicular", command=self.abrir_calendario).grid(row=7, column=4,sticky="W",padx=5,pady=5)
+        
     
     #Creation of buttons
     def widgetsTabDriverData(self):
