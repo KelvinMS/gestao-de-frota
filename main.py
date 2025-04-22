@@ -380,14 +380,16 @@ class Application(VehiclesFunctions,DriversFunctions,vehicle_data.VehicleDataFun
         self.treeView_table.bind("<Double-1>",self.onDoubleClickVehicleTreeView)
         
         #ScrollBar Vertical and Horizontal
-        scrollbarVerticalTreeView = Scrollbar(self.frameTreeView_1,orient='vertical',)
-        self.treeView_table.config(yscroll=scrollbarVerticalTreeView.set)
-        scrollbarVerticalTreeView.place(relx=0.98,rely=.01,relwidth=.023,relheight=.95)
-                
-        scrollbarHorizontalTreeView = Scrollbar(self.frameTreeView_1,orient='horizontal',)
-        self.treeView_table.config(xscroll=scrollbarHorizontalTreeView.set)
-        scrollbarHorizontalTreeView.place(relx=0.01,rely=.96,relwidth=.97,relheight=.040)
-           
+        scrollbarVerticalTreeView = Scrollbar(self.frameTreeView_1,orient='vertical',command=self.treeView_table.yview)
+        scrollbarHorizontalTreeView = Scrollbar(self.frameTreeView_1,orient='horizontal',command=self.treeView_table.xview)
+        #self.treeView_table.config(yscroll=scrollbarVerticalTreeView.set)
+        self.treeView_table.config(yscrollcommand=scrollbarVerticalTreeView.set, xscrollcommand=scrollbarHorizontalTreeView.set)
+        self.treeView_table.grid(row=0, column=0, sticky='nsew')
+        scrollbarVerticalTreeView.grid(row=0, column=1, sticky='ns')
+        scrollbarHorizontalTreeView.grid(row=1, column=0, sticky='ew')
+        self.frameTreeView_1.grid_rowconfigure(0, weight=1)
+        self.frameTreeView_1.grid_columnconfigure(0, weight=1)
+
     #Creation of treeview
     def createTreeViewDataDrivers(self):
         self.treeView_table.heading('#0', text='')
