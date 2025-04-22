@@ -308,7 +308,7 @@ class Application(VehiclesFunctions,DriversFunctions,vehicle_data.VehicleDataFun
         self.calendar = Calendar(self.tab_car_data, date_pattern='yyyy-mm-dd', locale='pt_BR')
         self.lbl_lastRevision_date =Label(self.tab_car_data,text="")
         self.lbl_lastRevision_date.grid(row=7, column=5,columnspan=2,sticky="W",padx=5,pady=5)
-        tk.Button(self.tab_car_data, text="Selecionar Data da Revisão Veicular", command=self.abrir_calendario).grid(row=7, column=4,sticky="W",padx=5,pady=5)
+        tk.Button(self.tab_car_data, text="Selecionar Data da Revisão Veicular", command=self.abrir_calendario).grid(row=7, column=4,sticky="W",pady=5)
         
     
     #Creation of buttons
