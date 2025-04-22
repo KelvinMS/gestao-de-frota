@@ -46,10 +46,10 @@ class VehicleDataFuntionsDB():
     #     self.desconnect_vehicle_db()
 
     #Add vehicle to db and update treeview
-    def addVehiclesDB(self,marca,modelo,placa,quilometragem,ano,combustivel):       
+    def addVehiclesDB(self,marca,modelo,placa,quilometragem,ano,combustivel,data_ulti_revisao):       
         self.connect_vehicle_db()
-        self.cursor.execute(""" INSERT INTO  vehicles (marca,modelo,placa,quilometragem,ano,combustivel)
-                            VALUES (?,?,?,?,?,?)""", (marca,modelo,placa,quilometragem,ano,combustivel))
+        self.cursor.execute(""" INSERT INTO  vehicles (marca,modelo,placa,quilometragem,ano,combustivel,data_ulti_revisao)
+                            VALUES (?,?,?,?,?,?,?)""", (marca,modelo,placa,quilometragem,ano,combustivel,data_ulti_revisao))
         self.conn.commit()
         self.desconnect_vehicle_db()
         print('Veiculo Adicionado')
@@ -63,11 +63,11 @@ class VehicleDataFuntionsDB():
         print('Veiculo Deletado')
 
     #Update vehicle from db
-    def updateVehicleDB(self,marca,modelo,placa,quilometragem,ano,combustivel, cod):
+    def updateVehicleDB(self,marca,modelo,placa,quilometragem,ano,combustivel,data_ulti_revisao, cod):
         self.connect_vehicle_db()
         self.cursor.execute(""" UPDATE vehicles 
-            SET  marca = ?,modelo = ?,placa = ?,quilometragem = ?,ano = ?,combustivel = ? WHERE cod = ? """,
-            (marca,modelo,placa,quilometragem,ano,combustivel, cod))
+            SET  marca = ?,modelo = ?,placa = ?,quilometragem = ?,ano = ?,combustivel = ? ,data_ulti_revisao = ? WHERE cod = ? """,
+            (marca,modelo,placa,quilometragem,ano,combustivel,data_ulti_revisao, cod))
         self.conn.commit()
         self.desconnect_vehicle_db()
         print('Veiculo Atualizado')
