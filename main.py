@@ -46,7 +46,7 @@ class VehiclesFunctions():
             if result == False:
                 messagebox.showerror("Erro", "Preencha todos os campos necessários para adicionar veículo!")
                 return
-            vehicle_data.VehicleDataFuntionsDB.addVehiclesDB(self,self.marca,self.modelo,self.placa,self.quilometragem,self.ano,self.combustivel,self.data_ulti_revisao)
+            vehicle_data.VehicleDataFuntionsDB.addVehiclesDB(self,self.marca,self.modelo,self.placa,self.quilometragem,self.ano,self.combustivel,self.data_ulti_revisao,self.motorista_associado)
             self.updateVehiclesInTreeView()
             messagebox.showinfo("Sucesso", "Veículo adicionado com sucesso!")
     
@@ -67,7 +67,7 @@ class VehiclesFunctions():
         if result==False and not self.cod:
             messagebox.showerror("Erro", "Preencha o código do veículo!")
             return
-        vehicle_data.VehicleDataFuntionsDB.updateVehicleDB(self,self.marca,self.modelo,self.placa,self.quilometragem,self.ano,self.combustivel,self.data_ulti_revisao,self.cod)
+        vehicle_data.VehicleDataFuntionsDB.updateVehicleDB(self,self.marca,self.modelo,self.placa,self.quilometragem,self.ano,self.combustivel,self.data_ulti_revisao,self.motorista_associado,self.cod)
         self.cleanFormCarEntry()
         self.updateVehiclesInTreeView()
         messagebox.showinfo("Sucesso", "Informações do Veículo alteradas com sucesso!")
@@ -103,7 +103,7 @@ class VehiclesFunctions():
         self.cleanFormCarEntry()
         self.treeView_table.selection()
         for entry in self.treeView_table.selection():
-            col1,col2,col3,col4,col5,col6,col7,col8,col9 = self.treeView_table.item(entry,'values')
+            col1,col2,col3,col4,col5,col6,col7,col8,col9,col10 = self.treeView_table.item(entry,'values')
             self.entry_cod.insert(END,col1)
             self.entry_marca.insert(END,col2)
             self.entry_modelo.insert(END,col3)
@@ -240,6 +240,7 @@ class Application(VehiclesFunctions,DriversFunctions,vehicle_data.VehicleDataFun
         vehicle_data.VehicleDataFuntionsDB.createTableVehicles(self)
         drivers_data.DriverDataFuntionsDB.createTableDrivers(self)
         
+        
         self.mainPage()
         self.frames()
         self.updateVehiclesInTreeView()
@@ -269,12 +270,15 @@ class Application(VehiclesFunctions,DriversFunctions,vehicle_data.VehicleDataFun
         
     #widgets tab veiculos
     def widgetsTabVehiclesData(self):
-        
+
+        self.lblFrame_Aditional_info= LabelFrame(self.tab_car_data,text="Informações Adicionais",bg='orange').grid(row=0,column=5,sticky="nsew",padx=100,pady=20)
         self.btn_search_car = tk.Button(self.tab_car_data, text="Pesquisar",command=self.searchVehicle).grid(row=0, column=0, pady=5)
         self.btn_add_car = tk.Button(self.tab_car_data, text="Adicionar Veículo",command=self.addVehiclesDB).grid(row=1, column=0, pady=5)
         self.btn_delete_car = tk.Button(self.tab_car_data, text="Remover Veículo",command=self.deleteVehicleDB).grid(row=2, column=0, pady=5)
         self.btn_update_car = tk.Button(self.tab_car_data, text="Editar Veículo",command=self.updateVehicleDB).grid(row=3, column=0, pady=5)
         self.btn_delete_formEntry = tk.Button(self.tab_car_data, text="Apagar campos de pesquisa",command=self.cleanFormCarEntry).grid(row=4, column=0,pady=1)
+        
+
 
         #Entry and labels
         tk.Label(self.tab_car_data, text="Código do Veículo:").grid(row=0, column=4,sticky="W")
