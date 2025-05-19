@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk, messagebox
+from turtle import st
 from PIL import Image, ImageTk
 from tkinter import filedialog
 from tkcalendar import Calendar
@@ -112,6 +113,8 @@ class VehiclesFunctions():
             self.entry_ano.insert(END,col6)
             self.entry_combustivel.insert(END,col7)
             self.lbl_lastRevision_date.config(text="Data da última revisão: "+col9)
+        #if col10 != '':
+            
 
     #Load the values of treeview selection on Entrys
     def onDoubleClickDriverTreeView(self,event):
@@ -258,20 +261,22 @@ class Application(VehiclesFunctions,DriversFunctions,vehicle_data.VehicleDataFun
     def frames(self):
         self.framePanelData_1 = Frame(self.root,bd=4,bg='#dfe3ee',
             highlightbackground='#759fe6', highlightthickness=3)
-        self.framePanelData_1.place(relx=0.05,rely=0.05,relwidth=0.90,relheight=.42)
+        self.framePanelData_1.grid(row=0,column=0,padx=5,pady=5,sticky="nsew")
+        self.framePanelData_1.grid_rowconfigure(0, weight=1)
+        self.framePanelData_1.grid_columnconfigure(0, weight=1)
+        #self.framePanelData_1.place(relx=0.05,rely=0.05,relwidth=0.90,relheight=.42)
 
         self.frameTreeView_1 = Frame(self.root,bd=4,bg='#dfe3ee',
             highlightbackground='#759fe6', highlightthickness=2)
-        self.frameTreeView_1.place(relx=0.05,rely=0.5,relwidth=0.90,relheight=.50)
+        #self.frameTreeView_1.place(relx=0.05,rely=0.5,relwidth=0.90,relheight=.50)
 
         self.createWidgets()
-        self.treeView_table = ttk.Treeview(self.frameTreeView_1, height=1,columns=('col1','col2','col3','col4','col5','col6','col7','col8','col9'))
+        self.treeView_table = ttk.Treeview(self.frameTreeView_1, height=1,columns=('col1','col2','col3','col4','col5','col6','col7','col8','col9','col10'),show='headings')
         self.createTreeViewDataVehicles()
         
     #widgets tab veiculos
     def widgetsTabVehiclesData(self):
 
-        self.lblFrame_Aditional_info= LabelFrame(self.tab_car_data,text="Informações Adicionais",bg='orange').grid(row=0,column=5,sticky="nsew",padx=100,pady=20)
         self.btn_search_car = tk.Button(self.tab_car_data, text="Pesquisar",command=self.searchVehicle).grid(row=0, column=0, pady=5)
         self.btn_add_car = tk.Button(self.tab_car_data, text="Adicionar Veículo",command=self.addVehiclesDB).grid(row=1, column=0, pady=5)
         self.btn_delete_car = tk.Button(self.tab_car_data, text="Remover Veículo",command=self.deleteVehicleDB).grid(row=2, column=0, pady=5)
@@ -313,8 +318,11 @@ class Application(VehiclesFunctions,DriversFunctions,vehicle_data.VehicleDataFun
         self.lbl_lastRevision_date =Label(self.tab_car_data,text="")
         self.lbl_lastRevision_date.grid(row=7, column=5,columnspan=2,sticky="W",padx=5,pady=5)
         tk.Button(self.tab_car_data, text="Selecionar Data da Revisão Veicular", command=self.abrir_calendario).grid(row=7, column=4,sticky="W",pady=5)
+        self.widgets_aditional_info()
         
+
     
+
     #Creation of buttons
     def widgetsTabDriverData(self):
         
@@ -366,16 +374,41 @@ class Application(VehiclesFunctions,DriversFunctions,vehicle_data.VehicleDataFun
         self.tab_car_data = Frame(self.tabs_notebook,background='lightgray')
         self.tab_driver_data = Frame(self.tabs_notebook,background='lightgray')
         self.tab_notification_data = Frame(self.tabs_notebook,background='lightgray')
+        self.tab_car_data.columnconfigure(6, weight=1)
 
         self.tabs_notebook.add(self.tab_car_data,text='Veículos')
         self.tabs_notebook.add(self.tab_driver_data,text='Motoristas')
         self.tabs_notebook.add(self.tab_notification_data,text='Notificações')
-        self.tabs_notebook.place(relx=0,rely=0,relwidth=.98,relheight=.98)
 
+        
+        self.tabs_notebook.grid(row=0,column=0,padx=5,pady=5,sticky="nsew")
         self.tabs_notebook.bind('<<NotebookTabChanged>>', self.onTabChange)
 
         self.widgetsTabVehiclesData()
         self.widgetsTabDriverData()
+
+
+    def widgets_aditional_info(self):
+        print("Aditional Info")
+        self.frmAditional_info = Frame(self.tab_car_data)
+        self.frmAditional_info.grid(row=0,column=6,padx=5, pady=5,sticky="new")
+
+
+        #Frame Informações Adicionais
+        self.lblframeAditional_info = tk.LabelFrame(self.frmAditional_info, text="Informações Adicionais",bg='lightgray')
+        self.lblframeAditional_info.pack(fill="both", expand=True)
+
+        self.FrameNoImage = Frame(self.lblframeAditional_info,background='red').grid(row=0,column=1,sticky="nsew",padx=1,pady=1)
+        imagem_original = Image.open('images\\undefined_profile_image.png')  # pode ser jpg, png, etc.
+        imagem_redimensionada = imagem_original.resize((80, 80))
+        undefined_profile_image = ImageTk.PhotoImage(imagem_redimensionada)
+        self.lblDriverImage = Label(self.lblframeAditional_info,image=undefined_profile_image,bg='lightgray',anchor='nw')
+        undefined_profile_image.image = undefined_profile_image  # Manter uma referência à imagem
+        self.lblDriverImage.grid(row=0,column=0,sticky="nsew",padx=1,pady=1)
+
+        Label(self.lblframeAditional_info,text="Motorista Associado:",bg='lightgray').grid(row=1,column=0,sticky='w')
+        Label(self.lblframeAditional_info,text="Nome do Motorista",bg='lightgray').grid(row=2,column=0,sticky='w')
+        Label(self.lblframeAditional_info,text="CNH do Motorista",bg='lightgray').grid(row=3,column=0,sticky='w')
 
     #Creation of treeview
     def createTreeViewDataVehicles(self):
@@ -390,6 +423,7 @@ class Application(VehiclesFunctions,DriversFunctions,vehicle_data.VehicleDataFun
         self.treeView_table.heading('#7', text='Combustível')
         self.treeView_table.heading('#8', text='Data Prox Revisão')
         self.treeView_table.heading('#9', text='Data Ult Revisão')
+        self.treeView_table.heading('#10', text='Motorista Associado')
 
         self.treeView_table.column('#0',width=10,stretch=NO)
         self.treeView_table.column('#1',width=15,anchor=CENTER,stretch=NO)
@@ -401,6 +435,7 @@ class Application(VehiclesFunctions,DriversFunctions,vehicle_data.VehicleDataFun
         self.treeView_table.column('#7',width=150,anchor=CENTER,stretch=NO)
         self.treeView_table.column('#8',width=150,anchor=CENTER,stretch=NO)
         self.treeView_table.column('#9',width=150,anchor=CENTER,stretch=NO)
+        self.treeView_table.column('#10',width=150,anchor=CENTER,stretch=NO)
         self.treeView_table.place(relx=0.01,rely=.01,relwidth=.97,relheight=.95)
         self.treeView_table.bind("<Double-1>",self.onDoubleClickVehicleTreeView)
         
