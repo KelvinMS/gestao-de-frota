@@ -3,6 +3,7 @@ from tkinter import ttk, messagebox
 from turtle import st
 from PIL import Image, ImageTk
 from tkinter import filedialog
+from numpy import pad
 from tkcalendar import Calendar
 import tkinter as tk
 import vehicle_data
@@ -253,9 +254,10 @@ class Application(VehiclesFunctions,DriversFunctions,vehicle_data.VehicleDataFun
     def mainPage(self):
         self.root.title('Gestão de Frota')
         self.root.configure(background='RoyalBlue4')
-        self.root.geometry('1200x720')
+        self.root.geometry('800x500')
         self.root.resizable(False,False)
-        self.root.minsize(width=600,height=350)
+        #self.root.minsize(width=800,height=500)
+        
 
     #Creation of Frames
     def frames(self):
@@ -264,60 +266,67 @@ class Application(VehiclesFunctions,DriversFunctions,vehicle_data.VehicleDataFun
         self.framePanelData_1.grid(row=0,column=0,padx=5,pady=5,sticky="nsew")
         self.framePanelData_1.grid_rowconfigure(0, weight=1)
         self.framePanelData_1.grid_columnconfigure(0, weight=1)
-        #self.framePanelData_1.place(relx=0.05,rely=0.05,relwidth=0.90,relheight=.42)
+
 
         self.frameTreeView_1 = Frame(self.root,bd=4,bg='#dfe3ee',
             highlightbackground='#759fe6', highlightthickness=2)
-        #self.frameTreeView_1.place(relx=0.05,rely=0.5,relwidth=0.90,relheight=.50)
+        self.frameTreeView_1.grid(row=1,column=0,padx=5,pady=5,sticky="nsew")
+        #self.frameTreeView_1.grid_rowconfigure(0, weight=1)
+        #self.frameTreeView_1.grid_columnconfigure(0, weight=1)
 
         self.createWidgets()
-        self.treeView_table = ttk.Treeview(self.frameTreeView_1, height=1,columns=('col1','col2','col3','col4','col5','col6','col7','col8','col9','col10'),show='headings')
         self.createTreeViewDataVehicles()
         
     #widgets tab veiculos
     def widgetsTabVehiclesData(self):
 
-        self.btn_search_car = tk.Button(self.tab_car_data, text="Pesquisar",command=self.searchVehicle).grid(row=0, column=0, pady=5)
-        self.btn_add_car = tk.Button(self.tab_car_data, text="Adicionar Veículo",command=self.addVehiclesDB).grid(row=1, column=0, pady=5)
-        self.btn_delete_car = tk.Button(self.tab_car_data, text="Remover Veículo",command=self.deleteVehicleDB).grid(row=2, column=0, pady=5)
-        self.btn_update_car = tk.Button(self.tab_car_data, text="Editar Veículo",command=self.updateVehicleDB).grid(row=3, column=0, pady=5)
-        self.btn_delete_formEntry = tk.Button(self.tab_car_data, text="Apagar campos de pesquisa",command=self.cleanFormCarEntry).grid(row=4, column=0,pady=1)
+        self.frame_entries_vehicle = Frame(self.tab_car_data,background='lightgray')
+        self.frame_entries_vehicle.grid(row=0,column=0,padx=5, pady=5,sticky="nsew")
+
+
+        self.btn_search_car = tk.Button(self.frame_entries_vehicle, text="Pesquisar",command=self.searchVehicle).grid(row=0, column=0, pady=5)
+        self.btn_add_car = tk.Button(self.frame_entries_vehicle, text="Adicionar Veículo",command=self.addVehiclesDB).grid(row=1, column=0, pady=5)
+        self.btn_delete_car = tk.Button(self.frame_entries_vehicle, text="Remover Veículo",command=self.deleteVehicleDB).grid(row=2, column=0, pady=5)
+        self.btn_update_car = tk.Button(self.frame_entries_vehicle, text="Editar Veículo",command=self.updateVehicleDB).grid(row=3, column=0, pady=5)
+        self.btn_delete_formEntry = tk.Button(self.frame_entries_vehicle, text="Apagar campos de pesquisa",command=self.cleanFormCarEntry).grid(row=4, column=0,pady=1)
         
 
 
         #Entry and labels
-        tk.Label(self.tab_car_data, text="Código do Veículo:").grid(row=0, column=4,sticky="W")
-        self.entry_cod = tk.Entry(self.tab_car_data)
-        self.entry_cod.grid(row=0, column=5)
+        tk.Label(self.frame_entries_vehicle, text="Código do Veículo:",padx=5).grid(row=0, column=4,sticky="nw")
+        self.entry_cod = tk.Entry(self.frame_entries_vehicle)
+        self.entry_cod.grid(row=0, column=5,sticky="n",padx=5)
         
-        tk.Label(self.tab_car_data, text="Marca:").grid(row=1, column=4,sticky="W")
-        self.entry_marca = tk.Entry(self.tab_car_data)
+        tk.Label(self.frame_entries_vehicle, text="Marca:").grid(row=1, column=4,sticky="nw")
+        self.entry_marca = tk.Entry(self.frame_entries_vehicle)
         self.entry_marca.grid(row=1, column=5)
 
-        tk.Label(self.tab_car_data, text="Modelo:").grid(row=2, column=4,sticky="W")
-        self.entry_modelo = tk.Entry(self.tab_car_data)
+        tk.Label(self.frame_entries_vehicle, text="Modelo:").grid(row=2, column=4,sticky="nw")
+        self.entry_modelo = tk.Entry(self.frame_entries_vehicle)
         self.entry_modelo.grid(row=2, column=5)
 
-        tk.Label(self.tab_car_data, text="Placa:").grid(row=3, column=4,sticky="W")
-        self.entry_placa = tk.Entry(self.tab_car_data)
+        tk.Label(self.frame_entries_vehicle, text="Placa:").grid(row=3, column=4,sticky="nw")
+        self.entry_placa = tk.Entry(self.frame_entries_vehicle)
         self.entry_placa.grid(row=3, column=5)
 
-        tk.Label(self.tab_car_data, text="Quilometragem:").grid(row=4, column=4,sticky="W")
-        self.entry_quilometragem = tk.Entry(self.tab_car_data)
+        tk.Label(self.frame_entries_vehicle, text="Quilometragem:").grid(row=4, column=4,sticky="nw")
+        self.entry_quilometragem = tk.Entry(self.frame_entries_vehicle)
         self.entry_quilometragem.grid(row=4, column=5)
 
-        tk.Label(self.tab_car_data, text="Ano:").grid(row=5, column=4,sticky="W")
-        self.entry_ano = tk.Entry(self.tab_car_data)
+        tk.Label(self.frame_entries_vehicle, text="Ano:").grid(row=5, column=4,sticky="nw")
+        self.entry_ano = tk.Entry(self.frame_entries_vehicle)
         self.entry_ano.grid(row=5, column=5)
 
-        tk.Label(self.tab_car_data, text="Combustível:").grid(row=6, column=4,sticky="W")
-        self.entry_combustivel = tk.Entry(self.tab_car_data)
+        tk.Label(self.frame_entries_vehicle, text="Combustível:").grid(row=6, column=4,sticky="nw")
+        self.entry_combustivel = tk.Entry(self.frame_entries_vehicle)
         self.entry_combustivel.grid(row=6, column=5)
 
-        self.calendar = Calendar(self.tab_car_data, date_pattern='yyyy-mm-dd', locale='pt_BR')
-        self.lbl_lastRevision_date =Label(self.tab_car_data,text="")
-        self.lbl_lastRevision_date.grid(row=7, column=5,columnspan=2,sticky="W",padx=5,pady=5)
-        tk.Button(self.tab_car_data, text="Selecionar Data da Revisão Veicular", command=self.abrir_calendario).grid(row=7, column=4,sticky="W",pady=5)
+        self.calendar = Calendar(self.frame_entries_vehicle, date_pattern='yyyy-mm-dd', locale='pt_BR',
+                                 selectmode='day', year=datetime.datetime.now().year, month=datetime.datetime.now().month,
+                                 day=datetime.datetime.now().day)
+        self.lbl_lastRevision_date =Label(self.frame_entries_vehicle,text="")
+        self.lbl_lastRevision_date.grid(row=7, column=5,columnspan=2,sticky="nw",padx=5,pady=5)
+        tk.Button(self.frame_entries_vehicle, text="Selecionar Data da Revisão Veicular", command=self.abrir_calendario).grid(row=7, column=4,sticky="W",pady=5)
         self.widgets_aditional_info()
         
 
@@ -374,7 +383,6 @@ class Application(VehiclesFunctions,DriversFunctions,vehicle_data.VehicleDataFun
         self.tab_car_data = Frame(self.tabs_notebook,background='lightgray')
         self.tab_driver_data = Frame(self.tabs_notebook,background='lightgray')
         self.tab_notification_data = Frame(self.tabs_notebook,background='lightgray')
-        self.tab_car_data.columnconfigure(6, weight=1)
 
         self.tabs_notebook.add(self.tab_car_data,text='Veículos')
         self.tabs_notebook.add(self.tab_driver_data,text='Motoristas')
@@ -390,15 +398,14 @@ class Application(VehiclesFunctions,DriversFunctions,vehicle_data.VehicleDataFun
 
     def widgets_aditional_info(self):
         print("Aditional Info")
-        self.frmAditional_info = Frame(self.tab_car_data)
-        self.frmAditional_info.grid(row=0,column=6,padx=5, pady=5,sticky="new")
-
-
+        self.frmAditional_info = Frame(self.tab_car_data, bg='lightgray')
+        self.frmAditional_info.grid(row=0,column=1,padx=5, pady=5,sticky="new")
+        
         #Frame Informações Adicionais
         self.lblframeAditional_info = tk.LabelFrame(self.frmAditional_info, text="Informações Adicionais",bg='lightgray')
         self.lblframeAditional_info.pack(fill="both", expand=True)
 
-        self.FrameNoImage = Frame(self.lblframeAditional_info,background='red').grid(row=0,column=1,sticky="nsew",padx=1,pady=1)
+        self.FrameNoImage = Frame(self.lblframeAditional_info,background='lightgray').grid(row=0,column=1,sticky="nsew",padx=1,pady=1)
         imagem_original = Image.open('images\\undefined_profile_image.png')  # pode ser jpg, png, etc.
         imagem_redimensionada = imagem_original.resize((80, 80))
         undefined_profile_image = ImageTk.PhotoImage(imagem_redimensionada)
@@ -412,7 +419,8 @@ class Application(VehiclesFunctions,DriversFunctions,vehicle_data.VehicleDataFun
 
     #Creation of treeview
     def createTreeViewDataVehicles(self):
-             
+            
+        self.treeView_table = ttk.Treeview(self.frameTreeView_1, height=15,columns=('col1','col2','col3','col4','col5','col6','col7','col8','col9','col10'),show='headings')
         self.treeView_table.heading('#0', text='')
         self.treeView_table.heading('#1', text='cod')
         self.treeView_table.heading('#2', text='Marca')
@@ -426,17 +434,17 @@ class Application(VehiclesFunctions,DriversFunctions,vehicle_data.VehicleDataFun
         self.treeView_table.heading('#10', text='Motorista Associado')
 
         self.treeView_table.column('#0',width=10,stretch=NO)
-        self.treeView_table.column('#1',width=15,anchor=CENTER,stretch=NO)
-        self.treeView_table.column('#2',width=150,anchor=CENTER,stretch=NO)
-        self.treeView_table.column('#3',width=150,anchor=CENTER,stretch=NO)
-        self.treeView_table.column('#4',width=150,anchor=CENTER,stretch=NO)
-        self.treeView_table.column('#5',width=150,anchor=CENTER,stretch=NO)
-        self.treeView_table.column('#6',width=150,anchor=CENTER,stretch=NO)
-        self.treeView_table.column('#7',width=150,anchor=CENTER,stretch=NO)
-        self.treeView_table.column('#8',width=150,anchor=CENTER,stretch=NO)
-        self.treeView_table.column('#9',width=150,anchor=CENTER,stretch=NO)
-        self.treeView_table.column('#10',width=150,anchor=CENTER,stretch=NO)
-        self.treeView_table.place(relx=0.01,rely=.01,relwidth=.97,relheight=.95)
+        self.treeView_table.column('#1',width=30,anchor=CENTER,stretch=NO)
+        self.treeView_table.column('#2',width=100,anchor=CENTER,stretch=NO)
+        self.treeView_table.column('#3',width=100,anchor=CENTER,stretch=NO)
+        self.treeView_table.column('#4',width=100,anchor=CENTER,stretch=NO)
+        self.treeView_table.column('#5',width=100,anchor=CENTER,stretch=NO)
+        self.treeView_table.column('#6',width=100,anchor=CENTER,stretch=NO)
+        self.treeView_table.column('#7',width=100,anchor=CENTER,stretch=NO)
+        self.treeView_table.column('#8',width=100,anchor=CENTER,stretch=NO)
+        self.treeView_table.column('#9',width=100,anchor=CENTER,stretch=NO)
+        self.treeView_table.column('#10',width=100,anchor=CENTER,stretch=NO)
+        self.treeView_table.grid(row=0,column=0,sticky="nsew",padx=5,pady=5)
         self.treeView_table.bind("<Double-1>",self.onDoubleClickVehicleTreeView)
         
         #ScrollBar Vertical and Horizontal
@@ -447,8 +455,8 @@ class Application(VehiclesFunctions,DriversFunctions,vehicle_data.VehicleDataFun
         self.treeView_table.grid(row=0, column=0, sticky='nsew')
         scrollbarVerticalTreeView.grid(row=0, column=1, sticky='ns')
         scrollbarHorizontalTreeView.grid(row=1, column=0, sticky='ew')
-        self.frameTreeView_1.grid_rowconfigure(0, weight=1)
-        self.frameTreeView_1.grid_columnconfigure(0, weight=1)
+        #self.frameTreeView_1.grid_rowconfigure(0, weight=1)
+        #self.frameTreeView_1.grid_columnconfigure(0, weight=1)
 
     #Creation of treeview
     def createTreeViewDataDrivers(self):
